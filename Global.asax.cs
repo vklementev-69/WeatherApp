@@ -1,3 +1,4 @@
+using NLog;
 using System;
 using System.Text;
 using System.Web;
@@ -8,8 +9,11 @@ namespace WeatherApp
 {
     public class MvcApplication : HttpApplication
     {
+        private Logger _logger;
         protected void Application_Start()
         {
+            _logger = LogManager.GetCurrentClassLogger();
+            _logger.Info("Application started.");
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
@@ -45,7 +49,7 @@ namespace WeatherApp
         {
             // Log errors here if needed
             var ex = Server.GetLastError();
-            // You can add logging logic here
+            _logger.Error(ex);
         }
     }
 }

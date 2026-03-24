@@ -1,4 +1,6 @@
+using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using WeatherApp.Services;
@@ -12,6 +14,7 @@ namespace WeatherApp.Controllers
         // Координаты Москвы
         private const double MOSCOW_LAT = 55.7558;
         private const double MOSCOW_LON = 37.6173;
+        private const int TIMEOUT = 10;
 
         public WeatherController()
         {
@@ -23,9 +26,13 @@ namespace WeatherApp.Controllers
         {
             // Set UTF-8 encoding for the response
             Response.ContentEncoding = Encoding.UTF8;
-            
-            var weatherData = await _weatherService.GetWeatherDataAsync(MOSCOW_LAT, MOSCOW_LON);
-            return View(weatherData);
+            using (var cts = new CancellationTokenSource())
+            {
+                cts.CancelAfter(TimeSpan.FromSeconds(TIMEOUT)); // Timeout
+
+                var weatherData = await _weatherService.GetWeatherDataAsync(MOSCOW_LAT, MOSCOW_LON, cts.Token);
+                return View(weatherData);
+            }
         }
 
         // AJAX: Обновление данных
@@ -35,9 +42,14 @@ namespace WeatherApp.Controllers
             // Set UTF-8 encoding for JSON response
             Response.ContentEncoding = Encoding.UTF8;
             Response.ContentType = "application/json; charset=utf-8";
-            
-            var weatherData = await _weatherService.GetWeatherDataAsync(MOSCOW_LAT, MOSCOW_LON);
-            return Json(weatherData, JsonRequestBehavior.AllowGet);
+
+            using (var cts = new CancellationTokenSource())
+            {
+                cts.CancelAfter(TimeSpan.FromSeconds(TIMEOUT)); // Timeout
+
+                var weatherData = await _weatherService.GetWeatherDataAsync(MOSCOW_LAT, MOSCOW_LON, cts.Token);
+                return Json(weatherData, JsonRequestBehavior.AllowGet);
+            }
         }
-    }
+        }
 }
