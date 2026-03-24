@@ -1,0 +1,249 @@
+@model WeatherApp.Models.WeatherViewModel
+@{
+    ViewBag.Title = "Погода в Москве";
+}
+
+<div class="weather-app">
+    <!-- Фоновый градиент -->
+    <div class="bg-gradient"></div>
+
+    <div class="container main-container">
+        <!-- Шапка -->
+        <div class="row header-row">
+            <div class="col-xs-12">
+                <div class="page-header">
+                    <div class="pull-left">
+                        <h1>@Model.CityName</h1>
+                        <p class="text-muted">55.7558°N, 37.6173°E</p>
+                    </div>
+                    <div class="pull-right">
+                        <button class="btn btn-primary btn-lg" id="refreshBtn">
+                            <span class="glyphicon glyphicon-refresh"></span> Обновить
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Состояние загрузки -->
+        <div id="loadingState" class="row" style="display: none;">
+            <div class="col-xs-12 text-center">
+                <div class="well">
+                    <div class="spinner">
+                        <span class="glyphicon glyphicon-refresh glyphicon-spin"></span>
+                    </div>
+                    <p class="lead">Загрузка данных о погоде...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Состояние ошибки -->
+        <div id="errorState" class="row" style="display: @(Model.HasError ? "block" : "none");">
+            <div class="col-xs-12">
+                <div class="alert alert-danger text-center">
+                    <span class="glyphicon glyphicon-exclamation-sign" style="font-size: 48px;"></span>
+                    <p class="lead" id="errorMessage">@(Model.ErrorMessage ?? "Произошла ошибка")</p>
+                    <button class="btn btn-danger" id="retryBtn">Попробовать снова</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div id="weatherContent" style="display: @(Model.HasError ? "none" : "block");">
+            
+            <!-- Текущая погода -->
+            <div class="row current-weather-row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Текущая погода</h3>
+                        </div>
+                        <div class="panel-body text-center current-main">
+                            <div class="weather-icon-large">
+                                @if (Model.Current != null)
+                                {
+                                    <img src="@Model.Current.ConditionIcon" alt="@Model.Current.Condition" class="img-responsive center-block" />
+                                }
+                            </div>
+                            <div class="temperature-main">
+                                @if (Model.Current != null)
+                                {
+                                    <span class="temp-value">@Model.Current.Temperature.ToString("0")</span>
+                                    <span class="temp-unit">°C</span>
+                                }
+                            </div>
+                            <div class="condition-text">
+                                @if (Model.Current != null)
+                                {
+                                    @Model.Current.Condition
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Детали</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped table-details">
+                                <tbody>
+                                    <tr>
+                                        <td>Ощущается как</td>
+                                        <td class="text-right"><strong>@(Model.Current != null ? Model.Current.FeelsLike.ToString("0") + "°C" : "-")</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Влажность</td>
+                                        <td class="text-right"><strong>@(Model.Current != null ? Model.Current.Humidity + "%" : "-")</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ветер</td>
+                                        <td class="text-right"><strong>@(Model.Current != null ? Model.Current.WindSpeed + " км/ч " + Model.Current.WindDirection : "-")</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Давление</td>
+                                        <td class="text-right"><strong>@(Model.Current != null ? Model.Current.Pressure + " гПа" : "-")</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Видимость</td>
+                                        <td class="text-right"><strong>@(Model.Current != null ? Model.Current.Visibility + " км" : "-")</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Почасовой прогноз -->
+            <div class="row hourly-row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Почасовой прогноз</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover hourly-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Время</th>
+                                            <th class="text-center">Иконка</th>
+                                            <th class="text-center">Температура</th>
+                                            <th class="text-center">Вероятность дождя</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="hourlyContainer">
+                                        @if (Model.Hourly != null)
+                                        {
+                                            foreach (var hour in Model.Hourly)
+                                            {
+                                                <tr>
+                                                    <td>@hour.Time.ToString("HH:mm")</td>
+                                                    <td class="text-center">
+                                                        <img src="@hour.ConditionIcon" alt="@hour.Condition" style="width: 40px; height: 40px;" />
+                                                    </td>
+                                                    <td class="text-center"><strong>@hour.Temperature.ToString("0")°C</strong></td>
+                                                    <td class="text-center">
+                                                        @if (hour.ChanceOfRain > 0)
+                                                        {
+                                                            <span class="label label-info">@hour.ChanceOfRain%</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>-</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Прогноз на 3 дня -->
+            <div class="row daily-row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Прогноз на 3 дня</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div id="dailyContainer">
+                                @if (Model.Daily != null)
+                                {
+                                    foreach (var day in Model.Daily)
+                                    {
+                                        <div class="col-md-4 col-sm-12 daily-item">
+                                            <div class="thumbnail">
+                                                <div class="caption">
+                                                    <h3>@day.DayOfWeek <small>@day.Date.ToString("dd MMMM")</small></h3>
+                                                    <div class="text-center">
+                                                        <img src="@day.ConditionIcon" alt="@day.Condition" style="width: 64px; height: 64px;" />
+                                                        <p class="lead">@day.Condition</p>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-6 text-center">
+                                                            <span class="label label-danger" style="font-size: 16px;">@day.MaxTemp.ToString("0")°</span>
+                                                            <p class="text-muted">Макс</p>
+                                                        </div>
+                                                        <div class="col-xs-6 text-center">
+                                                            <span class="label label-primary" style="font-size: 16px;">@day.MinTemp.ToString("0")°</span>
+                                                            <p class="text-muted">Мин</p>
+                                                        </div>
+                                                    </div>
+                                                    <hr />
+                                                    <div class="row">
+                                                        <div class="col-xs-6">
+                                                            <p><span class="glyphicon glyphicon-tint"></span> @day.ChanceOfRain%</p>
+                                                        </div>
+                                                        <div class="col-xs-6">
+                                                            <p><span class="glyphicon glyphicon-flag"></span> @day.MaxWindSpeed км/ч</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-6">
+                                                            <p><span class="glyphicon glyphicon-arrow-up"></span> @day.Sunrise</p>
+                                                        </div>
+                                                        <div class="col-xs-6">
+                                                            <p><span class="glyphicon glyphicon-arrow-down"></span> @day.Sunset</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Футер -->
+        <div class="row footer-row">
+            <div class="col-xs-12">
+                <hr />
+                <footer class="text-center text-muted">
+                    <p>Данные предоставлены <a href="https://www.weatherapi.com/" target="_blank">WeatherAPI.com</a></p>
+                    @if (Model.Current != null && !string.IsNullOrEmpty(Model.Current.LastUpdated))
+                    {
+                        <p>Последнее обновление: @Model.Current.LastUpdated</p>
+                    }
+                </footer>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/Content/js/weather.js"></script>
+}

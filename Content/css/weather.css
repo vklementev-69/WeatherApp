@@ -1,0 +1,256 @@
+/* ============================================
+   Weather App Styles - Bootstrap 3 Theme
+   ============================================ */
+
+/* Background gradient */
+.bg-gradient {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #e94560 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    z-index: -1;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Main container */
+.main-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Page header */
+.page-header {
+    margin-top: 0;
+    border-bottom: 2px solid #337ab7;
+}
+
+.page-header h1 {
+    margin-top: 0;
+    color: #333;
+}
+
+/* Current weather section */
+.current-main {
+    padding: 20px;
+}
+
+.weather-icon-large img {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+.temperature-main {
+    margin: 15px 0;
+}
+
+.temp-value {
+    font-size: 72px;
+    font-weight: 300;
+    line-height: 1;
+    color: #333;
+}
+
+.temp-unit {
+    font-size: 24px;
+    color: #666;
+}
+
+.condition-text {
+    font-size: 24px;
+    color: #666;
+    text-transform: capitalize;
+}
+
+/* Table details */
+.table-details {
+    margin-bottom: 0;
+}
+
+.table-details td {
+    vertical-align: middle;
+}
+
+/* Hourly table */
+.hourly-table {
+    margin-bottom: 0;
+}
+
+.hourly-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+}
+
+.hourly-table td {
+    vertical-align: middle;
+}
+
+/* Daily forecast */
+.daily-item {
+    margin-bottom: 20px;
+}
+
+.daily-item .thumbnail {
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.daily-item .thumbnail:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.daily-item h3 {
+    margin-top: 0;
+    font-size: 20px;
+}
+
+.daily-item h3 small {
+    display: block;
+    margin-top: 5px;
+}
+
+/* Loading spinner */
+.spinner {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.glyphicon-spin {
+    animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Panels */
+.panel {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.panel-primary > .panel-heading {
+    background-color: #337ab7;
+    border-color: #337ab7;
+    border-radius: 8px 8px 0 0;
+}
+
+.panel-info > .panel-heading {
+    background-color: #5bc0de;
+    border-color: #5bc0de;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Labels */
+.label {
+    border-radius: 4px;
+}
+
+/* Footer */
+.footer-row {
+    margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-container {
+        margin-top: 10px;
+        padding: 10px;
+    }
+    
+    .temp-value {
+        font-size: 48px;
+    }
+    
+    .page-header .pull-left,
+    .page-header .pull-right {
+        float: none !important;
+        text-align: center;
+    }
+    
+    .page-header .pull-right {
+        margin-top: 10px;
+    }
+    
+    .daily-item {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+/* Animation for content fade in */
+#weatherContent {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+}
+
+.alert-danger {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+}
+
+/* Well styling */
+.well {
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    border-radius: 8px;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+/* Button styling */
+.btn {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Table hover effect */
+.table-hover > tbody > tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Thumbnail styling */
+.thumbnail {
+    border-radius: 8px;
+    padding: 15px;
+}
+
+/* HR styling */
+hr {
+    border-top: 1px solid #ddd;
+    margin: 15px 0;
+}
