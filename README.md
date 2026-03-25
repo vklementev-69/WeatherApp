@@ -43,6 +43,7 @@ WeatherApp/
 ├── Models/
 │   └── WeatherModels.cs        # Модели данных
 ├── Services/
+│   └── WeatherHttpCLient.cs       # Сервис для работы с API
 │   └── WeatherService.cs       # Сервис для работы с API
 ├── Views/
 │   ├── Shared/
