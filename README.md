@@ -41,11 +41,11 @@ WeatherApp/
 ├── Filters/
 │   └── EncodingFilter.cs       # Фильтр кодировки UTF-8
 ├── Helper/
-│   └── MapperService.cs       # Фильтр кодировки UTF-8
+│   └── MapperService.cs       # Маппинг моделей
 ├── Models/
 │   └── WeatherModels.cs        # Модели данных
 ├── Services/
-│   └── WeatherHttpCLient.cs       # Сервис для работы с API
+│   └── WeatherHttpCLient.cs    # Синглетон HttpClient
 │   └── WeatherService.cs       # Сервис для работы с API
 ├── Views/
 │   ├── Shared/
