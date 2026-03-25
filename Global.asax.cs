@@ -12,8 +12,6 @@ namespace WeatherApp
         private Logger _logger;
         protected void Application_Start()
         {
-            _logger = LogManager.GetCurrentClassLogger();
-            _logger.Info("Application started.");
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
@@ -49,6 +47,7 @@ namespace WeatherApp
         {
             // Log errors here if needed
             var ex = Server.GetLastError();
+            _logger = LogManager.GetCurrentClassLogger();
             _logger.Error(ex);
         }
     }

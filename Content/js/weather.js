@@ -50,7 +50,7 @@ function refreshWeather() {
     // Make AJAX request
     $.ajax({
         url: '/Weather/RefreshWeather',
-        type: 'POST',
+        type: 'GET',
         dataType: 'json',
         contentType: 'application/json; charset=utf-8',
         success: function(data) {

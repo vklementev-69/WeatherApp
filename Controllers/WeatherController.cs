@@ -1,8 +1,12 @@
+using NLog;
 using System;
+using System.Configuration;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using WeatherApp.Models;
 using WeatherApp.Services;
 
 namespace WeatherApp.Controllers
@@ -12,13 +16,19 @@ namespace WeatherApp.Controllers
         private readonly IWeatherService _weatherService;
 
         // Координаты Москвы
-        private const double MOSCOW_LAT = 55.7558;
-        private const double MOSCOW_LON = 37.6173;
+        private readonly double _moscowLat;
+        private readonly double _moscowLon;
+        private readonly Logger _logger;
         private const int TIMEOUT = 10;
 
         public WeatherController()
         {
             _weatherService = new WeatherService();
+            _logger = LogManager.GetCurrentClassLogger();
+            if (!Double.TryParse(ConfigurationManager.AppSettings["MoscowLat"], out _moscowLat))
+                throw new ArgumentException("Web.coinfig. MoscowLat is not valid.");
+            if (!Double.TryParse(ConfigurationManager.AppSettings["MoscowLon"], out _moscowLon))
+                throw new ArgumentException("Web.coinfig. MoscowLon is not valid.");
         }
 
         // GET: Weather
@@ -26,17 +36,49 @@ namespace WeatherApp.Controllers
         {
             // Set UTF-8 encoding for the response
             Response.ContentEncoding = Encoding.UTF8;
-            using (var cts = new CancellationTokenSource())
+            try
             {
-                cts.CancelAfter(TimeSpan.FromSeconds(TIMEOUT)); // Timeout
+                using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(TIMEOUT)))
+                {
+                    var weatherData = await _weatherService.GetWeatherDataAsync(
+                        _moscowLat,
+                        _moscowLon,
+                        cts.Token);
 
-                var weatherData = await _weatherService.GetWeatherDataAsync(MOSCOW_LAT, MOSCOW_LON, cts.Token);
-                return View(weatherData);
+                    return View(weatherData);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.Error(ex);
+                return View(new WeatherViewModel
+                {
+                    HasError = true,
+                    ErrorMessage = "Ошибка подключения к сервису погоды. Проверьте интернет-соединение."
+                });
+            }
+            catch (TaskCanceledException ex)
+            {
+                _logger.Error(ex);
+                return View(new WeatherViewModel
+                {
+                    HasError = true,
+                    ErrorMessage = "Превышено время ожидания ответа от сервера."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+                return View(new WeatherViewModel
+                {
+                    HasError = true,
+                    ErrorMessage = $"Произошла ошибка при получении данных: {ex.Message}"
+                });
             }
         }
 
         // AJAX: Обновление данных
-        [HttpPost]
+        [HttpGet]
         public async Task<JsonResult> RefreshWeather()
         {
             // Set UTF-8 encoding for JSON response
@@ -47,7 +89,7 @@ namespace WeatherApp.Controllers
             {
                 cts.CancelAfter(TimeSpan.FromSeconds(TIMEOUT)); // Timeout
 
-                var weatherData = await _weatherService.GetWeatherDataAsync(MOSCOW_LAT, MOSCOW_LON, cts.Token);
+                var weatherData = await _weatherService.GetWeatherDataAsync(_moscowLat, _moscowLon, cts.Token);
                 return Json(weatherData, JsonRequestBehavior.AllowGet);
             }
         }

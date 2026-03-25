@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "Погода в Москве";
 }
-
+@Html.AntiForgeryToken()
 <div class="weather-app">
     <!-- Фоновый градиент -->
     <div class="bg-gradient"></div>
@@ -51,7 +51,7 @@
 
         <!-- Основной контент -->
         <div id="weatherContent" style="display: @(Model.HasError ? "none" : "block");">
-            
+
             <!-- Текущая погода -->
             <div class="row current-weather-row">
                 <div class="col-md-6 col-sm-12">
