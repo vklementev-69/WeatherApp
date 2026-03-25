@@ -40,6 +40,8 @@ WeatherApp/
 │   └── WeatherController.cs    # Контроллер погоды
 ├── Filters/
 │   └── EncodingFilter.cs       # Фильтр кодировки UTF-8
+├── Helper/
+│   └── MapperService.cs       # Фильтр кодировки UTF-8
 ├── Models/
 │   └── WeatherModels.cs        # Модели данных
 ├── Services/
