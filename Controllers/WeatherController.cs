@@ -21,9 +21,9 @@ namespace WeatherApp.Controllers
         private readonly Logger _logger;
         private const int TIMEOUT = 10;
 
-        public WeatherController()
+        public WeatherController(IWeatherService weatherService)
         {
-            _weatherService = new WeatherService();
+            _weatherService = weatherService;
             _logger = LogManager.GetCurrentClassLogger();
             if (!Double.TryParse(ConfigurationManager.AppSettings["MoscowLat"], out _moscowLat))
                 throw new ArgumentException("Web.coinfig. MoscowLat is not valid.");

@@ -1,9 +1,14 @@
+using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using System;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using WeatherApp.Controllers;
+using WeatherApp.Services;
+using ServiceCollection = Microsoft.Extensions.DependencyInjection.ServiceCollection;
+
 
 namespace WeatherApp
 {
@@ -12,6 +17,15 @@ namespace WeatherApp
         private Logger _logger;
         protected void Application_Start()
         {
+            var services = new ServiceCollection();
+
+            services.AddScoped<IWeatherService, WeatherService>();
+
+            services.AddTransient<WeatherController>();
+
+            var provider = services.BuildServiceProvider();
+            DependencyResolver.SetResolver(new Infrastructure.DefaultDependencyResolver(provider));
+
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
